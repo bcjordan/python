@@ -26,7 +26,7 @@ class MilhouseGame:
     PAUSE_KEYS = {K_SPACE}
 
     IMAGES_LOCATION = './'
-    
+
     GAME_TITLE = "Milhouse Rage"
 
     def __init__(self):
