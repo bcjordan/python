@@ -5,7 +5,9 @@ from LaserBolt import LaserBolt
 class Battlecruiser(pygame.sprite.Sprite):
     IMAGE_ASSET = "assets/battlecruiser.gif"
     DEBUG = False
-    
+    LASER_SOUND = "assets/laser.wav"
+    EXPLODE_SOUND = "assets/death_explode.wav"
+
     '''A simple Battlecruiser class'''
 
     def load_sprite(self):
@@ -38,11 +40,17 @@ class Battlecruiser(pygame.sprite.Sprite):
         new_bolt = LaserBolt(self.screen, self.x + self.image_w / 2, self.y  - 15)
         self.lasers.append(new_bolt)
 
+        # Play laser sound
+        self.laser_sound.play()
+
     def draw(self):
         if (self.DEBUG):
             print("Drawing Battlecruiser at {0} {1}").format(self.x, self.y)
 
-        self.screen.blit(self.image, (self.x, self.y))
+        if not self.game_over: self.screen.blit(self.image, (self.x, self.y))
+        if self.game_over:
+            ending_font = self.font.render("Game over, man!", 1, (255, 0, 0))
+            self.screen.blit(ending_font, (10, 50))
 
         # Draw lasers
         for laser in self.lasers:
@@ -51,7 +59,16 @@ class Battlecruiser(pygame.sprite.Sprite):
             else:
                 self.lasers.remove(laser)
 
+    def explode(self):
+        self.explode_sound.play()
+
+        if self.DEBUG: print("Exploding")
+
+        self.game_over = True
+
     def __init__(self, screen, x, y):
+        self.font = pygame.font.Font(None, 36)
+        pygame.sprite.Sprite.__init__(self)
         self.screen = screen
         self.image = self.load_sprite()
         self.image_w, self.image_h = self.image.get_size()
@@ -61,14 +78,24 @@ class Battlecruiser(pygame.sprite.Sprite):
 
         # Set up bounding box for image
         self.rect = self.image.get_rect()
+
+        self.update_rect()
+
+        self.active = True
+
+        self.lasers = []
+
+        self.laser_sound = pygame.mixer.Sound(self.LASER_SOUND)
+        self.explode_sound = pygame.mixer.Sound(self.EXPLODE_SOUND)
+
+        self.game_over = False
+        
+    def update_rect(self):
         self.rect.move(self.x, self.y)
         self.rect.topleft = (self.x, self.y)
         self.rect.bottomright = (self.x + self.image_w,
                                  self.y + self.image_h)
 
-        self.active = True
-
-        self.lasers = []
 
 class BattlecruiserGame:
     DEBUG = False

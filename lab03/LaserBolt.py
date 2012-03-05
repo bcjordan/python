@@ -17,12 +17,15 @@ class LaserBolt(pygame.sprite.Sprite):
 
         # Set up bounding box for image
         self.rect = self.image.get_rect()
+        self.update_rect()
+
+        self.active = True
+
+    def update_rect(self):
         self.rect.move(self.x, self.y)
         self.rect.topleft = (self.x, self.y)
         self.rect.bottomright = (self.x + self.image_w,
                                  self.y + self.image_h)
-
-        self.active = True
 
     def load_sprite(self):
         '''Build pygame image from file |self.IMAGE_NAME|'''
@@ -39,6 +42,8 @@ class LaserBolt(pygame.sprite.Sprite):
         if(self.y <= 0):
             self.active = False
 
+        self.update_rect()
+
     def draw(self):
         if(self.DEBUG):
             print("Drawing LaserBolt at {0} {1}").format(self.x, self.y)
@@ -50,6 +55,7 @@ class LaserBoltGame:
     DEBUG = True
 
     def __init__(self, title, screen_width, screen_height):
+        pygame.sprite.Sprite.__init__(self)
         # Initialize Pygame
         pygame.init()
 

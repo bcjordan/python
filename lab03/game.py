@@ -25,12 +25,15 @@ class Game:
         # Generate Battlecruiser
         self.battlecruiser = Battlecruiser(self.screen,
                                            self.SCREEN_WIDTH / 2,
-                                           self.SCREEN_HEIGHT / 2)
+                                           self.SCREEN_HEIGHT * 5 / 7)
 
         # Generate 10 enemies
         self.enemies = []
         for i in range(10):
-            self.enemies.append(Enemy(self.screen, randint(0, self.SCREEN_WIDTH), randint(0, self.SCREEN_HEIGHT), self.battlecruiser))
+            self.enemies.append(Enemy(self.screen, randint(0, self.SCREEN_WIDTH), randint(0, self.SCREEN_HEIGHT - 300), self.battlecruiser))
+
+        # Add all sprites to group
+        self.sprites = pygame.sprite.Group(self.battlecruiser, self.enemies)
 
         # Set up clock
         self.clock = pygame.time.Clock()
@@ -41,28 +44,18 @@ class Game:
     def run(self):
         while True: # for each frame
             self.handle_input()
-            for enemy in self.enemies:
-                enemy.update()
-            self.battlecruiser.update()
+            for sprite in self.sprites:
+                sprite.update()
 
             self.clock.tick(self.FPS)
             self.screen.fill((255, 255, 255))
 
-            if(self.DEBUG):
-                time_display = self.font.render("Time: " + str(self.clock.get_time()), 1, (0, 0, 0))
-                rawtime_display = self.font.render("Raw Time: " + str(self.clock.get_rawtime()), 1, (0, 0, 0))
-                fps_display = self.font.render("FPS: " + str(self.clock.get_fps()), 1, (0, 0, 0))
-                pygame_total_ticks_display = self.font.render("Pygame Ticks (total): " + str(pygame.time.get_ticks()), 1, (0, 0, 0))
-                seconds_display = self.font.render("Seconds: " + str(self.seconds), 1, (0, 0, 0))
-                self.screen.blit(time_display, (10, 10))
-                self.screen.blit(rawtime_display, (10, 35))
-                self.screen.blit(fps_display, (10, 60))
-                self.screen.blit(pygame_total_ticks_display, (10, 85))
-                self.screen.blit(seconds_display, (10, 110))
+            for sprite in self.sprites:
+                sprite.draw()
 
-            for enemy in self.enemies:
-                enemy.draw()
-            self.battlecruiser.draw()
+            score = (11 - len(self.sprites)) * 100
+            ending_font = self.font.render("Score: {0}".format(score), 1, (0, 0, 255))
+            self.screen.blit(ending_font, (10, 10))
 
             pygame.display.flip()
 
@@ -91,6 +84,6 @@ class Game:
 
 
 if __name__ == "__main__":
-    print("Loading main")
+    print("Loading game window...")
 
-    Game("Enemy", 800, 600).run()
+    Game("The Battle for Ram Aras", 800, 600).run()

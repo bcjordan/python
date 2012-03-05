@@ -22,10 +22,12 @@ class Enemy(pygame.sprite.Sprite):
         return image.convert_alpha()
 
     def update(self, action = "NONE"):
-
         # Update position
         self.x = self.x + self.dx
         self.y = self.y + self.dy
+
+        # Update rect
+        self.update_rect()
 
         if self.x <= 0 or self.x >= self.screen.get_width() - self.image_w:
             self.dx = -1 * self.dx
@@ -35,11 +37,19 @@ class Enemy(pygame.sprite.Sprite):
         # Update lasers
         if self.thePlayer:
             for laser in self.thePlayer.lasers:
-                print("Saw laser")
-                # if pygame.sprite.collide_rect(self, laser): should work...
-                if self.rect.colliderect(laser.rect):
+                if self.DEBUG:
+                    print("Self: {0}{1}").format(self.rect.topleft, self.rect.bottomright)
+                    print("Laser: {0}{1}").format(laser.rect.topleft, laser.rect.bottomright)
+                if pygame.sprite.collide_rect(self, laser):
                     self.hit_by_laser()
-                    print("Hit by laser")
+            if pygame.sprite.collide_rect(self, self.thePlayer):
+                self.thePlayer.explode()
+
+    def update_rect(self):
+        self.rect.move(self.x, self.y)
+        self.rect.topleft = (self.x, self.y)
+        self.rect.bottomright = (self.x + self.image_w,
+                                 self.y + self.image_h)
 
     def draw(self):
         if (self.DEBUG):
@@ -48,11 +58,15 @@ class Enemy(pygame.sprite.Sprite):
         self.screen.blit(self.image_alive if self.alive else self.image_dead,
                         (self.x, self.y))
 
+        if not self.alive:
+            self.kill()
+
     def hit_by_laser(self):
         self.image = self.image_dead
         self.alive = False
 
     def __init__(self, screen, x, y, player):
+        pygame.sprite.Sprite.__init__(self)
         self.screen = screen
         self.image_alive = self.load_sprite(self.IMAGE_ALIVE)
         self.image_dead = self.load_sprite(self.IMAGE_EXPLOSION)
@@ -67,10 +81,7 @@ class Enemy(pygame.sprite.Sprite):
         
         # Set up bounding box for image
         self.rect = self.image.get_rect()
-        self.rect.move(self.x, self.y)
-        self.rect.topleft = (self.x, self.y)
-        self.rect.bottomright = (self.x + self.image_w,
-                                 self.y + self.image_h)
+        self.update_rect()
 
         self.active = True
 
