@@ -108,7 +108,7 @@ class EnemyGame:
         # Generate 10 enemies
         self.enemies = []
         for i in range(10):
-            self.enemies.append(Enemy(self.screen, randint(0, self.SCREEN_WIDTH), randint(0, self.SCREEN_HEIGHT), None))
+            self.enemies.append(Enemy(self.screen, randint(0, self.SCREEN_WIDTH - 39), randint(0, self.SCREEN_HEIGHT - 82), None))
 
         # Set up clock
         self.clock = pygame.time.Clock()
